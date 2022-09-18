@@ -68,24 +68,34 @@ export class BossRaidService {
     await queryRunner.startTransaction();
     try {
       // 1. 존재하지 않는 레이드 레코드 예외 처리
-      const target = await queryRunner.manager.findOneBy(BossRaid, {
+      const raid = await queryRunner.manager.findOneBy(BossRaid, {
         raidRecordId: input.raidRecordId,
       });
-      if (!target) {
+      if (!raid) {
         throw new HttpException('존재하지 않는 기록입니다.', 422);
       }
       // 2. 레이드 레코드의 userId와 맞지 않는 예외 처리
-      if (target.user.id !== input.userId) {
+      if (raid.user.id !== input.userId) {
         throw new HttpException('옳지 않은 유저입니다.', 401);
       }
       // 3. 레이드 제한시간이 지났다면 예외 처리
       const endTime = new Date();
-      if (target.endTime < endTime) {
+      if (raid.endTime < endTime) {
         throw new HttpException('제한시간이 만료되었습니다.', 408);
       }
+      // 4. 레이드 종료시간 기입
       const result = await queryRunner.manager.save(BossRaid, {
         raidRecordId: input.raidRecordId,
         endTime: endTime,
+      });
+      // 5. 유저 종합점수 갱신
+      const user = await queryRunner.manager.findOneBy(User, {
+        id: input.userId,
+      });
+      const total_score = user.total_score + raid.score;
+      await queryRunner.manager.save(User, {
+        id: input.userId,
+        total_score: total_score,
       });
       await queryRunner.commitTransaction();
     } catch (error) {
