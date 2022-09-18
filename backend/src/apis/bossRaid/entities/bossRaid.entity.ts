@@ -4,19 +4,16 @@ import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 @Entity()
 export class BossRaid {
   @PrimaryGeneratedColumn()
-  raidRecordId: string;
+  raidRecordId: number;
 
   @Column()
   score: number;
 
   @Column()
-  entertime: Date;
+  enterTime: Date;
 
   @Column()
   endTime: Date;
-
-  @Column({ default: false })
-  canEnter: Boolean;
 
   @ManyToOne(() => User, { eager: true })
   user: User;

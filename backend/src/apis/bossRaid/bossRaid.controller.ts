@@ -1,9 +1,17 @@
-import { Body, Controller, Post, Inject, CACHE_MANAGER } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Post,
+  Inject,
+  CACHE_MANAGER,
+  Patch,
+} from '@nestjs/common';
 import { Cache } from 'cache-manager';
 import { ApiTags } from '@nestjs/swagger';
 import { BossRaidService } from './bossRaid.service';
 import axios from 'axios';
 import { CreateRaidInput } from './dtos/createRaid.input';
+import { UpdateRaidInput } from './dtos/updateRaid.input';
 
 @Controller('bossRaid')
 @ApiTags('bossRaid')
@@ -36,7 +44,11 @@ export class BossRaidContorller {
         ttl: 0,
       });
     }
-    console.log(raidInfo);
     return await this.bossRaidService.create(input, raidInfo);
+  }
+
+  @Patch('end')
+  async update(@Body() input: UpdateRaidInput) {
+    return await this.bossRaidService.update(input);
   }
 }
