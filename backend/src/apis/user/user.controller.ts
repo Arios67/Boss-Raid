@@ -12,10 +12,8 @@ export class UserController {
     return await this.userService.create(input);
   }
 
-  // @Get(':userId')
-  // async getUser(
-  //   @Param('userId') userId: number
-  // ){
-  //   return await this.userService.findOne(userId)
-  // }
+  @Get(':userId')
+  async getUser(@Param('userId') userId: number) {
+    return await this.userService.findOne(userId);
+  }
 }
