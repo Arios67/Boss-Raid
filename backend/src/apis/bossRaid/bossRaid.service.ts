@@ -1,10 +1,16 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import {
+  CACHE_MANAGER,
+  HttpException,
+  Inject,
+  Injectable,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
 import { User } from '../user/entities/user.entity';
 import { CreateRaidInput } from './dtos/createRaid.input';
 import { UpdateRaidInput } from './dtos/updateRaid.input';
 import { BossRaid } from './entities/bossRaid.entity';
+import { Cache } from 'cache-manager';
 
 @Injectable()
 export class BossRaidService {
@@ -14,6 +20,9 @@ export class BossRaidService {
 
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+
+    @Inject(CACHE_MANAGER)
+    private readonly cacheManager: Cache,
 
     private readonly dataSource: DataSource,
   ) {}
@@ -98,11 +107,32 @@ export class BossRaidService {
         total_score: total_score,
       });
       await queryRunner.commitTransaction();
+      await this.cacheManager.set(`user${input.userId}`, total_score, {
+        ttl: 10800,
+      });
     } catch (error) {
       await queryRunner.rollbackTransaction();
       throw error;
     } finally {
       await queryRunner.release();
+    }
+  }
+
+  async getStatus() {
+    const recent = await this.bossRaidRepository.find({
+      order: { enterTime: 'DESC' },
+      take: 1,
+    });
+    const currentTime = new Date();
+    if (recent[0] === undefined || recent[0].endTime < currentTime) {
+      return {
+        canEnter: true,
+      };
+    } else {
+      return {
+        canEnter: false,
+        enterdUserId: recent[0].user.id,
+      };
     }
   }
 }

@@ -5,6 +5,7 @@ import {
   Inject,
   CACHE_MANAGER,
   Patch,
+  Get,
 } from '@nestjs/common';
 import { Cache } from 'cache-manager';
 import { ApiTags } from '@nestjs/swagger';
@@ -50,5 +51,10 @@ export class BossRaidContorller {
   @Patch('end')
   async update(@Body() input: UpdateRaidInput) {
     return await this.bossRaidService.update(input);
+  }
+
+  @Get()
+  async getStatus() {
+    return await this.bossRaidService.getStatus();
   }
 }
