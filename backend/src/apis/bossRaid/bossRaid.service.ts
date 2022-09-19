@@ -21,7 +21,7 @@ export class BossRaidService {
     const user = await this.userRepository.findOneBy({ id: input.userId });
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
-    await queryRunner.startTransaction('REPEATABLE READ');
+    await queryRunner.startTransaction('READ COMMITTED');
     try {
       const currentTime = new Date();
       const recent = await queryRunner.manager.find(BossRaid, {
