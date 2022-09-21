@@ -33,6 +33,7 @@ export class BossRaidService {
 
     private readonly dataSource: DataSource,
   ) {}
+
   async create(input: CreateRaidInput, raidInfo) {
     const user = await this.userRepository.findOneBy({ id: input.userId });
     const queryRunner = this.dataSource.createQueryRunner();
@@ -90,7 +91,7 @@ export class BossRaidService {
         raidRecordId: input.raidRecordId,
       });
       if (!raid) {
-        throw new HttpException('존재하지 않는 기록입니다.', 422);
+        throw new HttpException('존재하지 않는 레코드입니다.', 422);
       }
       // 2. 레이드 레코드의 userId와 맞지 않는 예외 처리
       if (raid.user.id !== input.userId) {
@@ -99,7 +100,10 @@ export class BossRaidService {
       // 3. 레이드 제한시간이 지났다면 예외 처리
       const endTime = new Date();
       if (raid.endTime < endTime) {
-        throw new HttpException('제한시간이 만료되었습니다.', 408);
+        throw new HttpException(
+          '제한시간이 만료되었습니다. (레이드 실패)',
+          408,
+        );
       }
       // 4. 레이드 종료시간 기입
       const result = await queryRunner.manager.save(BossRaid, {
