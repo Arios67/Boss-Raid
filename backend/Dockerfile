@@ -1,11 +1,9 @@
 FROM node:16.17.0
 
-WORKDIR /usr/src
+WORKDIR /myfolder/
+COPY ./package.json /myfolder/
+COPY ./yarn.lock /myfolder/
+RUN yarn install    
 
-COPY . .
-
-RUN npm i
-
-RUN npm run build
-
-CMD ["npm", "run", "start:prod"]
+COPY . /myfolder/
+CMD yarn start:dev
