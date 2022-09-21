@@ -71,7 +71,7 @@ export class BossRaidContorller {
   @Patch('end')
   @ApiOperation({ summary: '레이드 종료' })
   @ApiOkResponse({ description: '레이드 성공' })
-  @ApiResponse({ status: 422, description: '존재하지 않는 레코드입니다.' })
+  @ApiResponse({ status: 404, description: '존재하지 않는 레코드입니다.' })
   @ApiResponse({ status: 401, description: '옳지 않은 유저입니다.' })
   @ApiResponse({
     status: 408,
