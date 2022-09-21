@@ -15,6 +15,9 @@ export class BossRaid {
   @Column()
   endTime: Date;
 
+  @Column({ default: false })
+  isCleared: Boolean;
+
   @ManyToOne(() => User, { eager: true })
   user: User;
 }

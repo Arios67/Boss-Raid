@@ -13,6 +13,7 @@ import { BossRaidService } from './bossRaid.service';
 import axios from 'axios';
 import { CreateRaidInput } from './dtos/createRaid.input';
 import { UpdateRaidInput } from './dtos/updateRaid.input';
+import { UserID } from './dtos/userId.dto';
 
 @Controller('bossRaid')
 @ApiTags('bossRaid')
@@ -56,5 +57,10 @@ export class BossRaidContorller {
   @Get()
   async getStatus() {
     return await this.bossRaidService.getStatus();
+  }
+
+  @Post('topRankerList')
+  async getRanking(@Body() userId: UserID) {
+    return await this.bossRaidService.getRanking(userId.userId);
   }
 }

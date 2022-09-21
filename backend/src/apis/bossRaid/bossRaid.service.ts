@@ -11,6 +11,13 @@ import { CreateRaidInput } from './dtos/createRaid.input';
 import { UpdateRaidInput } from './dtos/updateRaid.input';
 import { BossRaid } from './entities/bossRaid.entity';
 import { Cache } from 'cache-manager';
+import { UserID } from './dtos/userId.dto';
+
+export interface RankingInfo {
+  ranking: number; // 랭킹 1위의 ranking 값은 0입니다.
+  userId: number;
+  totalScore: number;
+}
 
 @Injectable()
 export class BossRaidService {
@@ -39,18 +46,20 @@ export class BossRaidService {
       });
 
       if (recent[0] === undefined || recent[0].endTime < currentTime) {
-        // enterTime = 현재 시간, default endTime = enterTime + 제한시간
+        // enterTime = 현재시간, default endTime = 현재시간 + 제한시간
         const enterTime = currentTime;
-        currentTime.setSeconds(
-          currentTime.getSeconds() + Number(raidInfo.bossRaidLimitSeconds),
+        const expireTime = new Date();
+
+        expireTime.setSeconds(
+          enterTime.getSeconds() + Number(raidInfo.bossRaidLimitSeconds),
         );
-        const endTime = currentTime;
+        const endTime = expireTime;
 
         const result = await queryRunner.manager.save(BossRaid, {
           user: user,
           score: raidInfo.levels[input.level].score,
           enterTime: enterTime,
-          endTime: endTime,
+          endTime: endTime, // = expireTime
         });
         await queryRunner.commitTransaction();
         return {
@@ -96,6 +105,7 @@ export class BossRaidService {
       const result = await queryRunner.manager.save(BossRaid, {
         raidRecordId: input.raidRecordId,
         endTime: endTime,
+        isCleared: true,
       });
       // 5. 유저 종합점수 갱신
       const user = await queryRunner.manager.findOneBy(User, {
@@ -108,7 +118,7 @@ export class BossRaidService {
       });
       await queryRunner.commitTransaction();
       await this.cacheManager.set(`user${input.userId}`, total_score, {
-        ttl: 10800,
+        ttl: 0,
       });
     } catch (error) {
       await queryRunner.rollbackTransaction();
@@ -134,5 +144,33 @@ export class BossRaidService {
         enterdUserId: recent[0].user.id,
       };
     }
+  }
+
+  async getRanking(userId: number) {
+    let result: RankingInfo;
+    let myRankingInfo: RankingInfo;
+    const users = await this.cacheManager.store.keys('user*');
+
+    const userScores = await Promise.all(
+      users.map(async (ele) => {
+        const userId = ele.substring(4);
+        const userTotalScore = await this.cacheManager.get(ele);
+        return [userId, userTotalScore];
+      }),
+    );
+
+    const ranking = userScores.sort((a, b) => {
+      a = a[1];
+      b = b[1];
+      return b - a;
+    });
+    const topRankerInfoList = ranking.map((ele, idx) => {
+      if (ele[0] === String(userId)) {
+        myRankingInfo = { ranking: idx, userId: ele[0], totalScore: ele[1] };
+      }
+      result = { ranking: idx, userId: ele[0], totalScore: ele[1] };
+      return result;
+    });
+    return { topRankerInfoList, myRankingInfo };
   }
 }
