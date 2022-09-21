@@ -91,7 +91,7 @@ export class BossRaidService {
         raidRecordId: input.raidRecordId,
       });
       if (!raid) {
-        throw new HttpException('존재하지 않는 레코드입니다.', 422);
+        throw new HttpException('존재하지 않는 레코드입니다.', 404);
       }
       // 2. 레이드 레코드의 userId와 맞지 않는 예외 처리
       if (raid.user.id !== input.userId) {
