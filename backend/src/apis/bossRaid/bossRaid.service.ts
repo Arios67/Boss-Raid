@@ -39,6 +39,7 @@ export class BossRaidService {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction('READ COMMITTED');
+
     try {
       const currentTime = new Date();
       const recent = await queryRunner.manager.find(BossRaid, {
