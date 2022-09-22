@@ -170,7 +170,8 @@ Request Body Example :
 
 
 ### <br>6. 보스레이드 랭킹 조회
-userId를 입력 받아 해당 유저의 랭킹과 함께 전체 유저의 total_score를 내림차순 정렬한 랭킹 배열을 반환합니다. <br><br>
+userId를 입력 받아 해당 유저의 랭킹과 함께 전체 유저의 total_score를 내림차순 정렬한 랭킹 배열을 반환합니다.<br>
+유저랭킹은 redis에 ` user${userId}: total_score` 형식으로 저장되어 있습니다.<br><br>
 Request Body Example :
 ```
 {
