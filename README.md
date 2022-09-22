@@ -20,7 +20,7 @@ https://drive.google.com/file/d/1GENKlnfbWKIHeQbWaM03EcMhP_q1t0Hn/view?usp=shari
 &nbsp;[2. 유저 조회](#2-유저-조회)<br>
 &nbsp;[3. 보스레이드 상태 조회](#3-보스레이드-상태-조회)<br>
 &nbsp;[4. 보스레이드 시작](#4-보스레이드-시작)<br>
-&nbsp;[5. 보스레이드 시작](#5-보스레이드-종료)<br>
+&nbsp;[5. 보스레이드 종료](#5-보스레이드-종료)<br>
 &nbsp;[6. 보스레이드 랭킹 조회](#6-보스레이드-랭킹-조회)<br>
 
 ### <br>1. 유저 생성
